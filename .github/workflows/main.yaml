@@ -12,7 +12,7 @@ env:
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
 jobs:
-  build-push-ads-to-evhub-docker-image:
+  build-push-docker-image:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
