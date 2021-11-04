@@ -1,5 +1,32 @@
-# Use latest jboss/base-jdk:11 image as the base
-FROM jboss/base-jdk:11
+FROM centos:7
+
+# Install packages necessary to run EAP
+RUN yum update -y && yum -y install xmlstarlet saxon augeas bsdtar unzip && yum clean all
+
+# Create a user and group used to launch processes
+# The user ID 1000 is the default for the first "regular" user on Fedora/RHEL,
+# so there is a high chance that this ID will be equal to the current user
+# making it easier to use volumes (no permission issues)
+RUN groupadd -r jboss -g 1000 && useradd -u 1000 -r -g jboss -m -d /opt/jboss -s /sbin/nologin -c "JBoss user" jboss && \
+    chmod 755 /opt/jboss
+
+# Set the working directory to jboss' user home directory
+WORKDIR /opt/jboss
+
+# Specify the user which should be used to execute all commands below
+USER jboss
+
+# User root user to install software
+USER root
+
+# Install necessary packages
+RUN yum -y install java-1.8.0-openjdk-devel && yum clean all
+
+# Switch back to jboss user
+USER jboss
+
+# Set the JAVA_HOME variable to make it clear where Java is located
+ENV JAVA_HOME /usr/lib/jvm/java
 
 # Set the WILDFLY_VERSION env variable
 ENV WILDFLY_VERSION 25.0.1.Final
